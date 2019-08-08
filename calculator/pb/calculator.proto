@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package calculator;
+option go_package = "pb";
+
+message SumRequest {
+	int64 first = 1;
+	int64 second = 2;
+}
+
+message SumResponse {
+	int64 result = 1;
+}
+
+message PrimesRequest {
+	int64 number = 1;
+}
+
+message PrimesResponse {
+	int64 prime = 1;
+}
+
+message AverageRequest {
+	float number = 1;
+}
+
+message AverageResponse {
+	float result = 1;
+}
+
+message MaximumRequest {
+	int64 number = 1;
+}
+
+message MaximumResponse {
+	int64 result = 1;
+}
+
+service CalculatorService {
+	// Unary
+	rpc Sum(SumRequest) returns (SumResponse) {};
+
+	// Server Streaming
+	rpc Primes(PrimesRequest) returns (stream PrimesResponse) {};
+
+	// Client Streaming
+	rpc Average(stream AverageRequest) returns (AverageResponse) {};
+
+	// BiDi Streaming
+	rpc Maximum(stream MaximumRequest) returns (stream MaximumResponse) {};
+}
