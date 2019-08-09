@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"google.golang.org/grpc/status"
 	"io"
 	"log"
 	"time"
@@ -29,7 +30,12 @@ func main() {
 
 	//doClientStream(c)
 
-	doBiDiStream(c)
+	//doBiDiStream(c)
+
+	// correct call
+	doErrorUnary(c, 10)
+	// error call
+	doErrorUnary(c, -10)
 }
 
 func doUnary(c pb.CalculatorServiceClient) {
@@ -133,4 +139,21 @@ func doBiDiStream(c pb.CalculatorServiceClient) {
 
 		fmt.Println("Current Maximum:", resp.GetResult())
 	}
+}
+
+func doErrorUnary(c pb.CalculatorServiceClient, number int64) {
+	fmt.Println("Starting to do a Error Unary RPC...")
+
+	resp, err := c.SquareRoot(context.Background(), &pb.SquareRootRequest{ Number: number })
+	if err != nil {
+		if s, ok := status.FromError(err); ok {
+			fmt.Println(s.Message())
+			fmt.Println(s.Code())
+		} else {
+			log.Fatalf("error while calling SquareRoot: %v", err)
+		}
+		return
+	}
+
+	fmt.Println(fmt.Sprintf("Square root of %d is %f", number, resp.GetResult()))
 }

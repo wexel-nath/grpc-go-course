@@ -5,10 +5,13 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"net"
 
 	"github.com/wexel-nath/grpc-go-course/calculator/pb"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type server struct {}
@@ -103,6 +106,21 @@ func (*server) Maximum(stream pb.CalculatorService_MaximumServer) error {
 			}
 		}
 	}
+}
+
+func (*server) SquareRoot(ctx context.Context, req *pb.SquareRootRequest) (*pb.SquareRootResponse, error) {
+	fmt.Println("SquareRoot was invoked")
+
+	number := req.GetNumber()
+	if number < 0 {
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"Received a negative number: %d",
+			number,
+		)
+	}
+
+	return &pb.SquareRootResponse{ Result: math.Sqrt(float64(number)) }, nil
 }
 
 func main() {
